@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# A hook script to check the commit log message.
+# Called by "git commit" with one argument, the name of the file
+# that has the commit message.  The hook should exit with non-zero
+# status after issuing an appropriate message if it wants to stop the
+# commit.  The hook is allowed to edit the commit message file.
+
+# Make sure the commit message has a line starting with either a Pivotal
+# Tracker story number or the string "[no-pt-story]".
+# Documentation for the PT commit message syntax is available here:
+# https://www.pivotaltracker.com/help/api#scm_post_commit
+grep -q "^\[.*#[0-9]\+.*\]\|^\[no-pt-story\]" "$1"
+
+if [ $? -ne 0 ]
+then
+    echo >&2 "ERROR: The commit message does not contain a PT story number."
+    echo >&2 "       If there is no story for this commit, add [no-pt-story] to the"
+    echo >&2 "       end of the commit message."
+    exit 1
+fi
+
